@@ -30,7 +30,7 @@ function createQueryBuilder(result: { data?: unknown; error?: unknown }) {
 const mockGetUser = vi.fn();
 const mockFromResults: Record<string, { data?: unknown; error?: unknown }> = {};
 
-vi.mock('@/app/lib/supabase', () => ({
+vi.mock('@/lib/supabase', () => ({
     supabase: {
         from: (table: string) => createQueryBuilder(mockFromResults[table] ?? { data: null, error: null }),
         auth: { 
@@ -40,7 +40,7 @@ vi.mock('@/app/lib/supabase', () => ({
     },
 }));
 
-import { usePresupuesto } from '../budget/hooks/usePresupuesto';
+import { usePresupuesto } from '@/hooks/usePresupuesto';
 import { act } from 'react';
 
 
@@ -271,5 +271,21 @@ describe('usePresupuesto', () => {
             expect(result.current.amounts).toEqual({ 1: 5 });
             expect(result.current.clientData.client).toBe('Juan Perez');
     });
+});
+
+it('redondea el precio unitario antes de multiplicar por la cantidad', async () => {
+    mockFromResults['items'] = {
+        data: [{ id: 9, name: 'X', price: 333, categories: { name: 'Cables' } }],
+        error: null,
+    };
+    const { result } = await renderLoadedHook();
+
+    act(() => {
+        result.current.adjustQuantity(9, 3);
+        result.current.setInflation(10);
+    });
+
+    // unitario: round(366.3) = 366 -> 3 * 366 = 1098 (y no round(1098.9) = 1099)
+    expect(result.current.total).toBe(1098);
 });
 });

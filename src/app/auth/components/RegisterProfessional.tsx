@@ -28,7 +28,7 @@ export default function RegisterProfessional() {
             return;
         }
 
-        router.push('/login?registered=1');
+        router.push('/auth/login?registered=1');
     };
 
     return (

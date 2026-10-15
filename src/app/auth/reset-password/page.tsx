@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -59,13 +60,13 @@ export default function ResetPasswordPage() {
     return (
         <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
             <div className='bg-white p-8 rounded-2xl shadow-sm border border-gray-100 w-full max-w-sm'>
-                <h1 className='text-4x1 mb-6'>
+                <h1 className='text-4xl mb-6'>
                     Electri<span className='text-blue-500'>SaaS</span>
                 </h1>
 
                 <form onSubmit={handleSubmit(onSubmit)} noValidate>
                     <div className='mb-4'>
-                        <label htmlFor='password' className='block text-sm font-medium text-gray-700'>
+                        <label htmlFor='password' className='mb-1 ml-1 block text-sm font-medium text-gray-700'>
                             Nueva contraseña
                         </label>
                         <input

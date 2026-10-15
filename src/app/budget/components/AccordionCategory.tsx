@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { lineSubtotal, unitPriceWithInflation } from '@/lib/pricing';
 
 interface Item {
     id: number;
@@ -26,8 +27,8 @@ export default function AccordionCategory({
     const [isOpen, setIsOpen] = useState(false);
 
     const categoryTotal = items.reduce((acc, item) => {
-        return acc + (amounts[item.id] || 0) * item.price * (1 + inflation / 100);
-}, 0);
+        return acc + lineSubtotal(item.price, amounts[item.id] || 0, inflation);
+    }, 0);
 
     const selectedCount = items.reduce((acc, item) => acc + (amounts[item.id] || 0), 0);
 
@@ -63,7 +64,7 @@ export default function AccordionCategory({
                             <div>
                                 <h3 className="font-bold text-gray-800 text-sm">{item.name}</h3>
                                 <p className="text-blue-600 font-medium text-sm">
-                                    ${(item.price * (1 + inflation / 100)).toLocaleString("es-AR")}
+                                    ${unitPriceWithInflation(item.price, inflation).toLocaleString("es-AR")}
                                 </p>
                             </div>
                             <div className="flex items-center gap-3">

@@ -2,6 +2,7 @@ import { createSupabaseServer } from "@/lib/supabase-server";
 import { notFound } from "next/navigation";
 import BudgetActions from "@/app/budget/components/BudgetActions";
 import PrintTrigger from './PrintTrigger';
+import { unitPriceWithInflation } from "@/lib/pricing";
 
 interface BudgetItem {
     id: number;
@@ -40,10 +41,6 @@ export default async function SharePage({ params, searchParams }: Props) {
         .order('category_snapshot', { ascending: true });
 
     const items = budgetItems || [];
-    const total = items.reduce((acc, item) => {
-        const unitPrice = item.price_snapshot * (1 + budget.inflation / 100);
-        return acc + item.quantity * unitPrice;
-    }, 0);
 
     // Agrupar por categoria
     const grouped = items.reduce((acc: { [key: string]: BudgetItem[] }, item) => {
@@ -53,10 +50,11 @@ export default async function SharePage({ params, searchParams }: Props) {
         return acc;
     }, {});
 
-    const formattedDate = new Date().toLocaleDateString('es-AR', {
+    const formattedDate = new Date(budget.created_at).toLocaleDateString('es-AR', {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
+        timeZone: 'America/Argentina/Buenos_Aires',
     });
 
     return (
@@ -108,7 +106,7 @@ export default async function SharePage({ params, searchParams }: Props) {
                                     day: '2-digit',
                                     month: 'long',
                                     year: 'numeric',
-                                    timeZone: 'UTC',
+                                    timeZone: 'America/Argentina/Buenos_Aires',
                                 })}
                             </p>
                         </div>
@@ -138,17 +136,17 @@ export default async function SharePage({ params, searchParams }: Props) {
                                 </thead>
                                 <tbody>
                                     {cartItems.map((item, i) => {
-                                        const unitPrice = item.price_snapshot * (1 + budget.inflation / 100);
+                                        const unitPrice = unitPriceWithInflation(item.price_snapshot, budget.inflation);
                                         const subtotal = item.quantity * unitPrice;
                                         return (
                                             <tr key={i} className="share-tr">
                                                 <td className="share-td share-td-name">{item.name_snapshot}</td>
                                                 <td className="share-td">{item.quantity}</td>
                                                 <td className="share-td share-td-num">
-                                                    ${Math.round(unitPrice).toLocaleString('es-AR')}
+                                                    ${unitPrice.toLocaleString('es-AR')}
                                                 </td>
                                                 <td className="share-td share-td-num share-td-subtotal">
-                                                    ${Math.round(subtotal).toLocaleString('es-AR')}
+                                                    ${subtotal.toLocaleString('es-AR')}
                                                 </td>
                                             </tr>
                                         );
@@ -163,7 +161,7 @@ export default async function SharePage({ params, searchParams }: Props) {
                 <div className="share-total-row">
                     <span className="share-total-label">TOTAL PRESUPUESTO</span>
                     <span className="share-total-value">
-                        ${Math.round(total).toLocaleString('es-AR')}
+                        ${budget.total.toLocaleString('es-AR')}
                     </span>
                 </div>
 

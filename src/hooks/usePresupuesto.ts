@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { DEFAULT_CLIENT } from "@/constants";
+import { lineSubtotal } from "@/lib/pricing";
 
 
 interface Item {
@@ -288,7 +289,7 @@ export function usePresupuesto() {
     const total = useMemo(() => {
         return items.reduce((acc, item) => {
             const quantity = amounts[item.id] || 0;
-            return acc + quantity * item.price * (1 + inflation / 100);
+            return acc + lineSubtotal(item.price, quantity, inflation);
         }, 0);
     }, [items, amounts, inflation])
 
