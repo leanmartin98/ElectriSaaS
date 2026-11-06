@@ -39,6 +39,7 @@ export function usePresupuesto() {
                 const { data, error } = await supabase
                     .from('items')
                     .select(`*, categories (name)`)
+                    .eq('active', true)
                     .order('name', { ascending: true });
 
                 if (error) console.error("Error items:", error.message); 

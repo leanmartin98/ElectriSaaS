@@ -111,3 +111,31 @@ export const resetPasswordSchema = z.object({
 });
 
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
+
+export const UNITS = ['unidad', 'metro', 'rollo', 'caja'] as const;
+
+export const itemSchema = z.object({
+    name: z
+        .string()
+        .trim()
+        .min(1, 'El nombre es obligatorio')
+        .max(120, 'El nombre no puede exceder los 120 caracteres'),
+    category_id: z.number({ error: 'Elegi una categoria' }),
+    price: z
+        .number({ error: 'Ingresa un precio válido' })
+        .positive('El precio debe ser mayor a 0')
+        .max(100_000_000, 'El precio es demasiado alto'),
+    unit: z.enum(UNITS, { error: 'Elegí una unidad' }),
+});
+
+export type ItemFormData = z.infer<typeof itemSchema>;
+
+export const categorySchema = z.object({
+    name: z
+        .string()
+        .trim()
+        .min(1, 'El nombre es obligatorio')
+        .max(40, 'El nombre no puede exceder los 40 caracteres'),
+});
+
+export type CategoryFormData = z.infer<typeof categorySchema>;
