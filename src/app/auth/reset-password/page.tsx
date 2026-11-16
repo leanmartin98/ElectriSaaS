@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { resetPasswordSchema, ResetPasswordFormData } from '@/schema/validations';
+import { AuthShell } from '../components/AuthShell';
 
 export default function ResetPasswordPage() {
     const router = useRouter();
@@ -51,61 +52,57 @@ export default function ResetPasswordPage() {
 
     if (!ready) {
         return (
-            <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-                <p className='text-gray-500'>Validando el link de recuperación...</p>
-            </div>
+            <AuthShell
+            eyebrow='Recuperar acceso'
+            title='Validando el link'
+            subtitle='Un momento, por favor.'
+            >
+                <p className='auth-subtitle'>Validando el link de recuperación...</p>
+            </AuthShell>
         );
     }
 
     return (
-        <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-            <div className='bg-white p-8 rounded-2xl shadow-sm border border-gray-100 w-full max-w-sm'>
-                <h1 className='text-4xl mb-6'>
-                    Electri<span className='text-blue-500'>SaaS</span>
-                </h1>
+        <AuthShell
+        eyebrow='Último paso'
+        title='Elegí tu nueva contraseña'
+        subtitle='Usá al menos 8 caracteres. Después vas a poder ingresar con ella.'
+        >
+            {serverError && (
+                <p role='alert' className='auth-alert auth-alert--error'>{serverError}</p>
+            )}
 
                 <form onSubmit={handleSubmit(onSubmit)} noValidate>
-                    <div className='mb-4'>
-                        <label htmlFor='password' className='mb-1 ml-1 block text-sm font-medium text-gray-700'>
-                            Nueva contraseña
-                        </label>
+                    <div className='auth-field'>
+                        <label htmlFor='password' className='auth-label'>Nueva contraseña</label>
                         <input
                             id='password'
                             type='password'
                             autoComplete='new-password'
                             {...register('password')}
-                            className={`input-standard ${errors.password ? 'border-red-400 focus:ring-red-300' : ''}`}
+                            className={`auth-input ${errors.password ? 'auth-input--error' : ''}`}
+                            placeholder='Mínimo 8 cararcteres'
                         />
-                        {errors.password && (
-                            <p className='mt-1 text-xs ml-1 text-red-500'>{errors.password.message}</p>
-                        )}
+                        {errors.password &&<p className='auth-error-text'>{errors.password.message}</p>}
                     </div>
 
-                    <div className='mb-4'>
-                        <label htmlFor="confirmPassword" className='block text-sm font-medium text-gray-700 mb-1 ml-1'>
-                            Confirmar contraseña
-                        </label>
+                    <div className='auth-field'>
+                        <label htmlFor="confirmPassword" className='auth-label'>Confirmar contraseña</label>
                         <input
                             id='confirmPassword'
                             type='password'
                             autoComplete='new-password'
                             {...register('confirmPassword')}
-                            className={`input-standard ${errors.confirmPassword ? 'border-red-400 focus:ring-red-300' : ''}`}
+                            className={`auth-input ${errors.confirmPassword ? 'auth-input--error' : ''}`}
+                            placeholder="Repetí la contraseña"
                         />
-                        {errors.confirmPassword && (
-                            <p className='mt-1 text-xs ml-1 text-red-500'>{errors.confirmPassword.message}</p>
-                        )}
+                        {errors.confirmPassword && <p className='auth-error-text'>{errors.confirmPassword.message}</p>}
                     </div>
 
-                    {serverError && (
-                        <p role='alert' className='mt-1 text-xs ml-1 text-red-500'>{serverError}</p>
-                    )}
-
-                    <button type='submit' disabled={loading} className='w-full btn btn-primary btn-md'>
+                    <button type='submit' disabled={loading} className='auth-submit'>
                         {loading ? 'Guardando...' : 'Guardar nueva contraseña'}
                     </button>
                 </form>
-            </div>
-        </div>
+        </AuthShell>
     );
 }

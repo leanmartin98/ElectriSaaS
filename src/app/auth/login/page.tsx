@@ -6,6 +6,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 import { loginSchema, LoginFormData } from "@/schema/validations";
+import { AuthShell } from "../components/AuthShell";
 
 function LoginForm() {
     const router = useRouter();
@@ -42,86 +43,71 @@ function LoginForm() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 w-full max-w-sm">
-                <h1 className="text-4xl">Electri<span className="text-blue-500">SaaS</span>
-                </h1>
-
+        <AuthShell
+            active="login"
+            eyebrow="Bienvenido de nuevo"
+            title="Ingresá a tu cuenta"
+            subtitle="Usá el email y la contraseña con los que te registraste."
+        >
                 {infoMessage && (
-                    <p className="text-green-700 bg-green-50 border border-green-200 rounded-lg text-xs px-3 py-2 mb-4">
+                    <p className="auth-alert auth-alert--success">
                         {infoMessage}
                     </p>
                 )}
 
-                <form onSubmit={handleSubmit(onSubmit)} noValidate>
-                    <div className="mb-3">
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 ml-1">
-                           Email 
-                        </label>
+                {serverError && (
+                <p role="alert" className="auth-alert auth-alert--error">{serverError}</p>
+            )}
+
+                <form onSubmit={handleSubmit(onSubmit)} className="auth-form" noValidate>
+                    <div className="auth-field">
+                    <label htmlFor="email" className="auth-label">Email</label>
                     <input
                     id="email"
                     type="email"
                     autoComplete="email"
                     {...register('email')}
-                    className={`input-standard ${errors.email ? 'border-red-400 focus:ring-red-300' : ''}`}
+                    className={`auth-input ${errors.email ? 'auth-input--error' : ''}`}
                     placeholder="tu@email.com"
                 />
-                {errors.email && (
-                    <p className="text-red-500 text-xs mt-1 ml-1">{errors.email.message}</p>
-                )}
+                {errors.email && <p className="auth-error-text">{errors.email.message}</p>}
                     </div>
 
-                    <div className="mb-2">
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1 ml-1">
-                            Contraseña
-                        </label>
+                <div className="auth-field">
+                    <label htmlFor="password" className="auth-label">Contraseña</label>
                     <input
                     id="password"
                     type="password"
                     autoComplete="current-password"
                     {...register('password')}
-                    className={`input-standard ${errors.password ? 'border-red-400 focus:ring-red-300' : ''}`}
+                    className={`auth-input ${errors.password ? 'auth-input--error' : ''}`}
                 />
-                {errors.password && (
-                    <p className="text-red-500 text-xs mt-1 ml-1">{errors.password.message}</p>
-                )}
-                    </div>
+                {errors.password && <p className="auth-error-text">{errors.password.message}</p>}
+                </div>
 
-                <div className="text-right mb-4">
-                    <Link href="/auth/forgot-password" className="text-sm text-blue-500 hover:underline">
+                <div className="auth-row-end">
+                    <Link href="/auth/forgot-password" className="auth-link">
                         ¿Olvidaste tu contraseña?
                     </Link>
                 </div>
 
-                {serverError && (
-                    <p role="alert" className="text-red-500  text-xs mb-4">{serverError}</p>
-                )}
+                {serverError &&<p role="alert" className="auth-alert auth-alert--error">{serverError}</p>}
 
                 <button
                 type="submit"
                 disabled={loading}
-                className="w-full btn btn-primary btn-md mb-3">
+                className="auth-submit">
                     {loading ? 'Ingresando...' : 'Ingresar'}
                 </button>
                 </form>
-
-                <p className="text-center text-sm text-gray-500">
-                    ¿No tenés cuenta?{' '}
-                    <Link href="/auth/register" className="text-blue-600 font-medium hover:underline">
-                        Registrate
-                    </Link>
-                </p>
-                </div>
-            </div>
+        </AuthShell>
     );
 }
 
 export default function Page() {
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <Suspense fallback={null}>
                 <LoginForm />
             </Suspense>
-        </div>
-    )
+    );
 }
