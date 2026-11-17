@@ -3,6 +3,7 @@ import { useState } from "react";
 import FormularioCliente from "./FormularioCliente";
 import AccordionCategory from "./AccordionCategory";
 import { usePresupuesto } from "@/hooks/usePresupuesto";
+import AppHeader from "./AppHeader";
 
 export default function Presupuestador() {
     const {
@@ -23,6 +24,7 @@ export default function Presupuestador() {
         activeItems,
         formKey,
         isLoadingProfile,
+        profile,
     } = usePresupuesto();
 
     const [copied, setCopied] = useState(false);
@@ -56,7 +58,11 @@ export default function Presupuestador() {
     const hasClientData = !!(clientData.client && clientData.phone && clientData.address);
 
     return (
-        <div className="grid-presupuestador">
+        <>
+        <AppHeader profile={profile}/>
+
+        <div className="app-content">
+            <div className="grid-presupuestador">
             {/* Columna Izquierda: Formulario */}
             <aside className="md:col-span-1">
                 {isLoaded && (
@@ -101,7 +107,7 @@ export default function Presupuestador() {
                 </section>
 
                 {/* Lista de items */}
-                <div className="space-y-2">
+                <div className="acc-list">
                     {groupedItems.map((group) => (
                         <AccordionCategory
                             key={group.categoryName}
@@ -166,5 +172,7 @@ export default function Presupuestador() {
                     </div>
                 </footer>
         </div>
+        </div>
+        </>
     );
 }

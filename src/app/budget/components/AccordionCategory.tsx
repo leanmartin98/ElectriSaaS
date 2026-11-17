@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Package } from "lucide-react";
 import { lineSubtotal, unitPriceWithInflation } from '@/lib/pricing';
 
 interface Item {
@@ -32,53 +32,64 @@ export default function AccordionCategory({
 
     const selectedCount = items.reduce((acc, item) => acc + (amounts[item.id] || 0), 0);
 
-    return ( 
-        <div className="accordion-category">
+    return (
+        <article className="acc">
             <button 
                 type="button"
                 onClick={() => setIsOpen((prev) => !prev)}
-                className="accordion-header"
+                className="acc-header"
+                aria-expanded={isOpen}
                 >
-            <div className= "flex items-center gap-3">
-                <ChevronDown 
-                className="accordion-chevron"
-                style={{ transform: isOpen ? "rotate(-90deg)" : "rotate(0deg)" }}
-                />
-                <span className="font-semibold text-gray-800">{categoryName}
+                <span className="acc-icon">
+                    <Package size={20} />
                 </span>
-                {selectedCount > 0 && (
-                    <span className="accordion-badge">{selectedCount > 999 ? '999+' : selectedCount}</span>
-                )}
-            </div>
+
+                <span className="acc-info">
+                    <span className="acc-name">{categoryName}</span>
+                    <span className="acc-meta">
+                        {items.length} {items.length === 1 ? 'material' : 'materiales'}
+                    </span>
+                </span>
+                
+            {selectedCount > 0 && (
+                <span className="acc-badge">{selectedCount > 999 ? '999+' : selectedCount}</span>
+            )}
             {categoryTotal > 0 && (
-                <span className="text-sm font-bold text-blue-600">
+                <span className="acc-total">
                     ${Math.round(categoryTotal).toLocaleString("es-AR")}
                 </span>
             )}
+
+            <ChevronDown 
+               size={20}
+               className={`acc-chevron ${isOpen ? 'acc-chevron--open' : ''}`}/>
             </button>
 
             {isOpen && (
-                <div className="accordion-body">
+                <div className="acc-body">
                     {items.map((item) => (
-                        <div className="card-item" key={item.id}>
-                            <div>
-                                <h3 className="font-bold text-gray-800 text-sm">{item.name}</h3>
-                                <p className="text-blue-600 font-medium text-sm">
+                        <div className="acc-item" key={item.id}>
+                            <div className="acc-item-info">
+                                <p className="acc-item-name">{item.name}</p>
+                                <p className="acc-item-price">
                                     ${unitPriceWithInflation(item.price, inflation).toLocaleString("es-AR")}
                                 </p>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <button 
-                                className="btn-counter-minus"
+                            <div className="acc-qty">
+                                <button
+                                type="button"
+                                className="acc-qty-btn"
+                                aria-label={`Restar uno a ${item.name}`}
                                 onClick={() => adjustQuantity(item.id, -1)}
                                 >
                                     -
                                 </button>
                                 <input
-                                className="input-counter"
+                                className="acc-qty-input"
                                 type="number"
                                 min="0"
                                 max='999'
+                                aria-label={`Cantidad de ${item.name}`}
                                 value={amounts[item.id] || 0}
                                 onChange={(e) => {
                                     const val = Math.min(999, Math.max(0, parseInt(e.target.value) || 0));
@@ -87,7 +98,9 @@ export default function AccordionCategory({
                                 onFocus={(e) => e.target.select()}
                                 />
                                 <button
-                                className="btn-counter-plus"
+                                type="button"
+                                className="acc-qty-btn acc-qty-btn--plus"
+                                aria-label={`Sumar uno a ${item.name}`}
                                 onClick={() => adjustQuantity(item.id, 1)}
                                 >
                                     +
@@ -97,6 +110,6 @@ export default function AccordionCategory({
                     ))}
                 </div>
             )}
-        </div>
+        </article>
     );
 }
